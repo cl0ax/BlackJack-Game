@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>HW4BlackJack</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="js/javascriptBJ.js"></script>
+    <script src="https://kit.fontawesome.com/9630f3325b.js" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="grid-container">
+    <header>
+        <h2>BlackJack Plus</h2>
+        <div id="cardIcons">
+            <cardIcon id="heart">&#9829;</cardIcon>
+            <cardIcon id="diamond">&#9830;</cardIcon>
+            <cardIcon id="club">&#9827;</cardIcon>
+            <cardIcon id="spade">&#9824;</cardIcon>
+        </div>
+    </header>
+    <div id="middleGrid">
+        <div class="Left">
+            <div id="placeBet" style="display: block">
+                <h2>Place your bet.</h2>
+                Enter Bet to Start <br><br/>
+                Bet <input type="text" name="bet" id="betValue" />
+                <button type="button" id="betButton" class="btn btn-primary" onclick="startGame();">Place Bet</button>
+                <div id="errors"></div>
+            </div>
+            <div id="currentGame">
+                <p id="currentGameTitle">Enter Bet to Start</p>
+                <table>
+                    <tr>
+                        <th>Player</th>
+                        <th>Hand Pts</th>
+                        <th>Num Hits</th>
+                    </tr>
+                    <tr>
+                        <td>User</td>
+                        <td id="playerValue"> 0 </td>
+                        <td id="playerHits"> 0 </td>
+                    </tr>
+                    <tr>
+                        <td>Dealer</td>
+                        <td id="dealerValue"> 0 </td>
+                        <td id="dealerHits"> 0 </td>
+                    </tr>
+                </table>
+            </div>
+            <div id="overallStatus">
+                <p id="overallStatusTitle" >Overall Status</p>
+                <table>
+                    <tr>
+                        <th>Balance</th>
+                        <th>Bet</th>
+                        <th>Games</th>
+                        <th>Wins</th>
+                        <th>Loss</th>
+                    </tr>
+                    <tr>
+                        <th id="balance">1000</th>
+                        <th id="bet">0</th>
+                        <th id="games">0</th>
+                        <th id="wins">0</th>
+                        <th id="losses">0</th>
+                    </tr>
+                </table>
+                <button id="outOfFunds" type="button" style="display: none" onclick="GameState.outOfFunds();" class="btn btn-primary"> Restart </button>
+            </div>
+        </div>
+        <div class="Center" id="centerColumn">
+            <div>
+                <div id="playerTitle">
+                    <h3>User Cards</h3>
+                </div>
+                <div id="Player Cards"></div>
+                <div id="playerAnimation"></div>
+                <div id="playerResults"></div>
+                <button id="hitButton" type="button" style="display: none" onclick="Player.hit();" class="btn btn-primary">Hit</button>
+                <button id="standButton" type="button" style="display: none" onclick="Player.stand();" class="btn btn-primary">Stick</button>
+            </div>
+            <div>
+                <div id="dealerTitle">
+                    <h3>Dealer Cards</h3>
+                </div>
+                <div id="Dealer Cards"></div>
+                <div id="dealerAnimation"></div>
+                <button id="dealerHit" type="button" style="display: none" onclick="Dealer.hit();" class="btn btn-primary">Dealer Play</button>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <p>Game by Abraham Hernandez | 2023</p>
+    </footer>
+</div>
+</body>
+</html>
