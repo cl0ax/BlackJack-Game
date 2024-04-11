@@ -1,0 +1,213 @@
+html {
+    color: white;
+    margin-left: -8px;
+    margin-top: -8px;
+    height: 100%;
+}
+button {
+    padding: 3px 8px 3px 8px;
+    background-color: royalblue;
+    border-radius: 15px;
+    border: 1px solid black;
+}
+#grid-container {
+    display: grid;
+    width: 100vw;
+    height: 100vh;
+    grid-template-rows: 15vh 75vh 10vh;
+}
+#hitButton, #standButton {
+    position: relative;
+    left: 15px;
+}
+#loser{
+    height: 120px;
+}
+#winner{
+    height: 50px;
+}
+header {
+    display: inline;
+    background-image: url("../imgs/darkOak.jpeg");
+    background-repeat: repeat;
+    list-style:none;
+    text-align: center;
+    border-bottom: 1px solid black;
+}
+footer {
+    background-image: url("../imgs/darkOak.jpeg");
+    background-repeat: repeat;
+    text-align: center;
+    border-top: 1px solid black;
+}
+#currentGame > table, tr, th, td {
+    margin-top: 50px;
+    padding: 5px;
+    border-collapse: collapse;
+    text-align: center;
+}
+#currentGame > p {
+    font-size: 1.2rem;
+    margin-bottom: -40px;
+    margin-left: 3px;
+    color: red;
+}
+#overallStatus > table, tr, th, td {
+    padding: 5px;
+    border: 1px solid black;
+    border-collapse: collapse;
+    text-align: center;
+}
+#playerResults > i {
+    margin: 5px;
+}
+#dealerAnimation > i {
+    margin: 5px;
+}
+#overallStatus > p {
+    font-size: 1.2rem;
+    margin-left: 5px;
+    color: blue;
+}
+#cardIcons {
+    font-size: 1.5rem;
+    color: black;
+}
+#busted{
+    display: none;
+    height: 112px;
+    position: absolute;
+}
+#playerAnimation {
+    font-size: 2rem;
+}
+#playerResults {
+    font-size: 1rem;
+}
+#dealerAnimation {
+    font-size: 1rem;
+}
+#diamond, #spade {
+    color: darkred;
+}
+#middleGrid {
+    display: grid;
+    grid-template-columns: 400px 1fr;
+}
+.Left {
+    background-color:#1f4339;
+    border:1px solid black;
+    padding-left: 20px;
+    display: grid;
+}
+
+.Center {
+    background-color:#1f4339;
+    border:1px solid black;
+    padding-left: 20px;
+    display: grid;
+}
+#cards {
+    padding-left: 20px;
+}
+.cardImg {
+    margin: 10px;
+    height: 130px;
+}
+#outOfFunds {
+    margin-top: 10px;
+}
+@media (max-width: 750px) {
+    #playerAnimation {
+        font-size: 1rem;
+    }
+    #playerResults {
+        font-size: 0.65rem;
+    }
+    #dealerAnimation {
+        font-size: 0.65rem;
+    }
+    table {
+        font-size: 0.8rem;
+    }
+    #placeBet > h2 {
+        font-size: 1.3rem;
+    }
+    #overallStatus {
+        margin-left: -15px;
+    }
+    #middleGrid {
+        grid-template-columns: 1fr 1fr;
+    }
+    #betValue {
+        max-width: 80px;
+    }
+    .cardImg {
+        margin: 10px;
+        height: 100px;
+    }
+    #overallStatus > p {
+        font-size: 1.1rem;
+        margin-left: 10px;
+    }
+    #overallStatus > table {
+        margin-left: 10px;
+    }
+    #currentGame > table {
+        margin-left: 0px;
+    }
+    #currentGame > p {
+        font-size: 1rem;
+        margin-left: -5px;
+    }
+}
+@media (max-width: 450px) {
+    html {
+        color: white;
+        margin-left: -8px;
+        margin-top: -8px;
+        height: 100vh;
+    }
+    #playerAnimation {
+        font-size: 0.7rem;
+    }
+    #playerResults {
+        font-size: 0.5rem;
+    }
+    #dealerAnimation {
+        font-size: 0.5rem;
+    }
+    table {
+        font-size: 0.5rem;
+    }
+    #placeBet > h2 {
+        font-size: 1rem;
+    }
+    #overallStatus {
+        margin-left: -15px;
+    }
+    #middleGrid {
+        grid-template-columns: 1fr 1fr;
+    }
+    #betValue {
+        max-width: 50px;
+    }
+    .cardImg {
+        margin: 5px;
+        height: 60px;
+    }
+    #overallStatus > p {
+        font-size: 0.9rem;
+        margin-left: 8px;
+    }
+    #overallStatus > table {
+        margin-left: 8px;
+    }
+    #currentGame > table {
+        margin-left: 0px;
+    }
+    #currentGame > p {
+        font-size: 0.8rem;
+        margin-left: -5px;
+    }
+}
