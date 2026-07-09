@@ -127,17 +127,17 @@ let UI = {
         let oStr = "";
         for ( let i=0; i<hand.length; i++ ){
             let cImg = hand[i].img;
-            oStr += `<img class='cardImg' src='imgs/${cImg}.png'  alt='Card' />`;
+            oStr += `<img class='cardImg' src='images/${cImg}.png'  alt='Card' />`;
         }
         displayObj.innerHTML = oStr;
     },
     displayDealerHandInitial : function(hand, id){
         let displayObj = document.getElementById(id);
         let oStr = "";
-        oStr +=`<img class='cardImg' src='imgs/purple_back.png' alt='Card'/>`;
+        oStr +=`<img class='cardImg' src='images/purple_back.png' alt='Card'/>`;
         for ( let i=1; i<hand.length; i++ ){
             let cImg = hand[i].img;
-            oStr += `<img class='cardImg' src='imgs/${cImg}.png'  alt='Card' />`;
+            oStr += `<img class='cardImg' src='images/${cImg}.png'  alt='Card' />`;
         }
         displayObj.innerHTML = oStr;
     },
@@ -355,19 +355,19 @@ let Player = {
         Player.updateBalanceLoss();
         Player.totalLosses++;
         UI.displayOverallStatus();
-        document.getElementById("playerResults").innerHTML = "<img id='loser' src='imgs/looser.png'>"
-        document.getElementById("dealerAnimation").innerHTML = "<img id='winner' src='imgs/winner.png'>"
+        document.getElementById("playerResults").innerHTML = "<img id='loser' src='images/looser.png'>"
+        document.getElementById("dealerAnimation").innerHTML = "<img id='winner' src='images/winner.png'>"
         document.getElementById("playerValue").innerHTML = Player.totalHandValue;
         document.getElementById("hitButton").style.display="none";
         document.getElementById("standButton").style.display="none";
         document.getElementById("dealerHit").style.display="none";
         document.getElementById("errors").innerHTML = "";
         if (hasBlackjack(Dealer.hand)) {
-            let blackjackImage = hasBlackjack(Dealer.hand) ? "<img src='imgs/blackJack.png' style='height: 100px; width: auto; object-fit: contain' alt='Blackjack' />" : "";
-            document.getElementById("dealerAnimation").innerHTML = "<img id='winner' src='imgs/winner.png'>" + blackjackImage;
+            let blackjackImage = hasBlackjack(Dealer.hand) ? "<img src='images/blackJack.png' style='height: 100px; width: auto; object-fit: contain' alt='Blackjack' />" : "";
+            document.getElementById("dealerAnimation").innerHTML = "<img id='winner' src='images/winner.png'>" + blackjackImage;
         }
         else{
-            document.getElementById("playerResults").innerHTML = "<img id='loser' src='imgs/looser.png'>";
+            document.getElementById("playerResults").innerHTML = "<img id='loser' src='images/looser.png'>";
         }
     },
     endGameWin : function () {
@@ -376,19 +376,19 @@ let Player = {
         Player.updateBalanceWin();
         Player.totalWins++;
         UI.displayOverallStatus();
-        document.getElementById("playerResults").innerHTML = "<img id='winner' src='imgs/winner.png'>"
-        document.getElementById("dealerAnimation").innerHTML = "<img id='loser' src='imgs/looser.png'>"
+        document.getElementById("playerResults").innerHTML = "<img id='winner' src='images/winner.png'>"
+        document.getElementById("dealerAnimation").innerHTML = "<img id='loser' src='images/looser.png'>"
         document.getElementById("placeBet").style.display="block";
         document.getElementById("hitButton").style.display="none";
         document.getElementById("standButton").style.display="none";
         document.getElementById("dealerHit").style.display="none";
         document.getElementById("errors").innerHTML = "";
         if (hasBlackjack(Player.hand)) {
-            let blackjackImage = hasBlackjack(Player.hand) ? "<img src='imgs/blackJack.png' style='height: 100px; width: auto; object-fit: contain' alt='Blackjack' />" : "";
-            document.getElementById("playerResults").innerHTML = "<img id='winner' src='imgs/winner.png'>" + blackjackImage;
+            let blackjackImage = hasBlackjack(Player.hand) ? "<img src='images/blackJack.png' style='height: 100px; width: auto; object-fit: contain' alt='Blackjack' />" : "";
+            document.getElementById("playerResults").innerHTML = "<img id='winner' src='images/winner.png'>" + blackjackImage;
         }
         else{
-            document.getElementById("playerResults").innerHTML = "<img id='winner' src='imgs/winner.png'>";
+            document.getElementById("playerResults").innerHTML = "<img id='winner' src='images/winner.png'>";
         }
     },
     endTurn : function () {
@@ -474,7 +474,7 @@ let Dealer = {
         if (this.isBusted()){
             document.getElementById("currentGameTitle").innerHTML = `Bet: ${Player.bet} Game Over Dealer Busts! Player Wins!`;
             Player.endGameWin();
-            document.getElementById("dealerAnimation").innerHTML = "<img src='imgs/busted.png' alt='Dealer Busted' style='height: 100px;'/>";
+            document.getElementById("dealerAnimation").innerHTML = "<img src='images/busted.png' alt='Dealer Busted' style='height: 100px;'/>";
             document.getElementById("overallStatusTitle").innerHTML ="Play Again!"
         }
     },

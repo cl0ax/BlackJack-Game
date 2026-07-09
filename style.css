@@ -28,14 +28,14 @@ button {
 }
 header {
     display: inline;
-    background-image: url("../imgs/darkOak.jpeg");
+    background-image: url("images/darkOak.jpeg");
     background-repeat: repeat;
     list-style:none;
     text-align: center;
     border-bottom: 1px solid black;
 }
 footer {
-    background-image: url("../imgs/darkOak.jpeg");
+    background-image: url("images/darkOak.jpeg");
     background-repeat: repeat;
     text-align: center;
     border-top: 1px solid black;
