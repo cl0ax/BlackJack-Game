@@ -1,26 +1,31 @@
 # BlackJack-Game
 
-BlackJack-Game is a browser-based blackjack project built with plain HTML, CSS, and JavaScript. It uses image assets for the deck, tracks a player balance, validates bets, deals cards, and lets the player hit or stick while the dealer plays by the game logic in `javascriptBJ.js`.
+This is a browser-based coursework project built with plain HTML, CSS, and JavaScript. It demonstrates DOM updates, form validation, object-based game state, random card selection, responsive styling, and a multi-step blackjack-like game loop.
 
-## What It Does
+It is a classroom exercise, not a production casino game or a complete implementation of standard blackjack rules.
 
-- Starts the player with a balance of 1000
-- Accepts integer bets up to 500
-- Deals two cards each to the player and dealer
-- Hides the dealer's first card until the player sticks
-- Tracks hand points, hits, wins, losses, and balance
-- Handles busts, ties, dealer play, and blackjack payouts
+## What it does
 
-## Stack
+- Starts the player with a balance of 1000.
+- Accepts positive integer bets up to 500 and no more than the current balance.
+- Deals two image-backed cards to the player and dealer.
+- Hides one dealer card during the player's turn.
+- Lets the player hit or stick.
+- Exposes a separate `Dealer Play` button for dealer hits after the player sticks.
+- Tracks displayed hand values, hit counts, games, wins, losses, bets, and balance.
+- Handles busts, ties, initial blackjack checks, and win or loss balance changes.
+- Provides responsive layouts for narrower screens.
+
+## Technologies
 
 - HTML
 - CSS
 - JavaScript
-- Static PNG/JPEG card and result images
+- Local PNG and JPEG assets
 
-## Run Locally
+## Run locally
 
-No build step is required. Clone the repo and open `jack.html` in a browser:
+No build step is required. Clone the repository and open `jack.html` in a browser:
 
 ```bash
 git clone https://github.com/cl0ax/BlackJack-Game.git
@@ -28,26 +33,25 @@ cd BlackJack-Game
 open jack.html
 ```
 
-You can also serve the folder with any static file server:
+You can also use a local static server:
 
 ```bash
 python3 -m http.server 8000
 ```
 
-Then visit:
+Then visit `http://localhost:8000/jack.html`.
 
-```text
-http://localhost:8000/jack.html
-```
+## How to play
 
-## How To Play
+1. Enter a bet and click `Place Bet`.
+2. Use `Hit` to draw another player card.
+3. Use `Stick` to end the player's turn.
+4. Use `Dealer Play` to advance the dealer's hand when that button appears.
+5. Place another bet after the hand is resolved, or use restart to reset the session.
 
-1. Enter a bet.
-2. Click `Place Bet`.
-3. Use `Hit` to draw another card.
-4. Use `Stick` to stop drawing and let the dealer play.
-5. Continue betting until the balance reaches zero or you restart.
+## Known limitations
 
-## Known Issue
-
-The original project README noted a bug where blackjack can sometimes trigger unexpectedly. That is still worth checking before treating the game logic as finished.
+- The rule set is simplified and the dealer wins ties.
+- Dealer play requires button clicks instead of running automatically.
+- The source contains overlapping blackjack checks and the original project noted that blackjack can trigger unexpectedly.
+- There are no automated tests.
