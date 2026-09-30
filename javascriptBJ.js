@@ -66,7 +66,7 @@ let Deck = {
         {'img': 'AC', 'value': 11, suit: 'clubs', 'dealt': false}
     ],
     cardsDealt : 0,
-    getCard: function (hand) {
+    getCard: function (...hands) {
         let card = null;
         let availableCards = this.cards.filter((card) => !card.dealt);
 
@@ -77,7 +77,7 @@ let Deck = {
             for (let i = 0; i < this.cards.length; i++) {
                 this.cards[i].dealt = false;
 
-                if (this.inTheHand(hand, this.cards[i])) {
+                if (this.inTheHand(hands, this.cards[i])) {
                     this.cards[i].dealt = true;
                     this.cardsDealt += 1;
                 }
@@ -95,15 +95,33 @@ let Deck = {
 
         return card;
     },
-    inTheHand : function(hand, card){
-        for( let i=0; i<hand.length; i++ ){
-            if (hand[i].img === card.img){
-                return true;
-            }
-        }
-        return false;
+    inTheHand : function(hands, card){
+        return hands.some(hand => hand.some(handCard => handCard.img === card.img));
     }
 };
+
+function handValue(hand) {
+    let total = 0;
+    let aces = 0;
+
+    for (const card of hand) {
+        total += card.value;
+        if (card.img.startsWith('A')) aces++;
+    }
+
+    while (total > 21 && aces > 0) {
+        total -= 10;
+        aces--;
+    }
+
+    return total;
+}
+
+function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[char]);
+}
 
 let UI = {
     setBet: function (betValue, displayId) {
@@ -114,10 +132,7 @@ let UI = {
         errorStatus = UI.checkForErrors(Player.bet);
 
         if (errorStatus.gotError) {
-            console.log("Error: ", errorStatus.errorMsg);
             document.getElementById("errors").innerHTML = errorStatus.errorMsg;
-        } else {
-            console.log("Bet Successfully Set: ", Player.bet);
         }
         return errorStatus.gotError;
 
@@ -152,7 +167,7 @@ let UI = {
             gotError : false
         };
         if(isNaN(betToInt)){
-            errorObj.errorMsg += `<span style='color: red; '> ${betValue} Is Not a Number\n </span><br/>`;
+            errorObj.errorMsg += `<span style='color: red; '> ${escapeHTML(betValue)} Is Not a Number\n </span><br/>`;
             errorObj.gotError = true;
         }
         if(betToInt > Player.balance){
@@ -220,9 +235,9 @@ let GameState = {
         document.getElementById("overallStatusTitle").innerHTML = "Overall Status";
         document.getElementById("currentGameTitle").innerHTML = "Enter Bet to Start";
         Player.hand = [];
+        Dealer.hand = [];
         Player.busted = false;
         Player.standing = false;
-        Player.usedSpecialAceRule = false;
         Player.balance = 1000;
         Player.bet = 0;
         Player.totalWins = 0;
@@ -230,7 +245,9 @@ let GameState = {
         Player.totalGames = 0;
         Player.numberOfHits = 0;
         Player.totalHandValue = 0;
-        Player.acesInHand = 0;
+        Deck.cards.forEach(card => { card.dealt = false; });
+        Deck.cardsDealt = 0;
+        GameState.hasWinner = false;
         clearInterval(GameState.animationId);
     },
     busted : function() {
@@ -271,7 +288,6 @@ let Player = {
     hand : [],
     busted : false,
     standing : false,
-    usedSpecialAceRule : false,
     balance : 1000,
     bet : 0,
     totalWins : 0,
@@ -279,37 +295,30 @@ let Player = {
     totalGames : 0,
     numberOfHits : 0,
     totalHandValue : 0,
-    acesInHand : 0,
     dealInitialCards: function () {
         this.hand = [];
         for (let i = 0; i < Blackjack.startingCards; i++) {
-            this.hand.push(Deck.getCard(this.hand));
+            this.hand.push(Deck.getCard(this.hand, Dealer.hand));
         }
     },
     hit: function() {
-        let card = Deck.getCard(this.hand);
+        let card = Deck.getCard(this.hand, Dealer.hand);
 
         if (card === null) {
-            this.hand = Blackjack.setHand();
+            this.hand = Blackjack.setHand(Dealer.hand);
         } else {
             this.hand.push(card);
         }
         UI.displayTotalHand(Player.hand, "Player Cards");
         this.numberOfHits++;
-        this.totalHandValue += card.value;
+        this.getTotalValue();
         UI.displayCurrentStatus();
         if (this.isBusted()){
-            if (Player.handContainsAces() && !Player.usedSpecialAceRule) {
-                for(let i=0; i<Player.acesInHand; i++){
-                    this.specialAceRule()
-                }
-            } else {
-                document.getElementById("currentGameTitle").innerHTML = `Player Takes a Hit... and BUSTS!`;
-                document.getElementById("playerAnimation").innerHTML = "<i class=\"fa-solid fa-burst fa-shake fa-2xl\" style=\"color: #bc3434;\"></i> BUSTED <i class=\"fa-solid fa-burst fa-shake fa-2xl\" style=\"color: #bc3434;\"></i>";
-                GameState.busted();
-                this.endGameLoss()
-                return;
-            }
+            document.getElementById("currentGameTitle").innerHTML = `Player Takes a Hit... and BUSTS!`;
+            document.getElementById("playerAnimation").innerHTML = "<i class=\"fa-solid fa-burst fa-shake fa-2xl\" style=\"color: #bc3434;\"></i> BUSTED <i class=\"fa-solid fa-burst fa-shake fa-2xl\" style=\"color: #bc3434;\"></i>";
+            GameState.busted();
+            this.endGameLoss();
+            return;
         }
         document.getElementById("currentGameTitle").innerHTML = `Player Takes Hit: ${Player.numberOfHits}. Click Hit or Stick`;
     },
@@ -320,26 +329,30 @@ let Player = {
         UI.displayTotalHand(Dealer.hand, "Dealer Cards");
         UI.displayCurrentStatus();
         this.endTurn();
-        if ((Dealer.totalHandValue > 16 && Dealer.totalHandValue > Player.totalHandValue)){
+        if (GameState.hasWinner) {
+            document.getElementById("dealerHit").style.display="none";
+            return;
+        }
+        const playerTotal = this.getTotalValue();
+        const dealerTotal = Dealer.getTotalValue();
+        if (dealerTotal < 17) return;
+        if (dealerTotal > 21) {
+            document.getElementById("currentGameTitle").innerHTML = `You Sticked on ${playerTotal} and Won Pts!`;
+            this.endGameWin();
+        } else if (dealerTotal > playerTotal) {
             document.getElementById("currentGameTitle").innerHTML = `You Sticked on ${Player.totalHandValue} and Lost Pts! `;
-            Player.endGameLoss();
-        }
-        if ((Dealer.totalHandValue === Player.totalHandValue)){
+            this.endGameLoss();
+        } else if (dealerTotal === playerTotal) {
             document.getElementById("currentGameTitle").innerHTML = `Dealer wins on ties! You Lost!`;
-            Player.endGameLoss();
-        }
-        if (Dealer.totalHandValue > 21 || (Player.totalHandValue > Dealer.totalHandValue && Dealer.totalHandValue > 16)){
+            this.endGameLoss();
+        } else {
             document.getElementById("currentGameTitle").innerHTML = `You Sticked on ${Player.totalHandValue} and Won Pts!`;
-            Player.endGameWin();
+            this.endGameWin();
         }
     },
     getTotalValue : function(){
-        let tempHandValue = 0;
-        for (let i=0; i<this.hand.length; i++){
-            tempHandValue += this.hand[i].value;
-        }
-        this.totalHandValue = tempHandValue;
-        return tempHandValue;
+        this.totalHandValue = handValue(this.hand);
+        return this.totalHandValue;
     },
     isBusted : function(){
         if (this.totalHandValue>21){
@@ -350,8 +363,9 @@ let Player = {
         }
     },
     endGameLoss : function () {
-        alert("Loser, Loser, Nyquil Boozer");
+        if (GameState.hasWinner) return;
         GameState.hasWinner = true;
+        alert("Loser, Loser, Nyquil Boozer");
         Player.updateBalanceLoss();
         Player.totalLosses++;
         UI.displayOverallStatus();
@@ -371,8 +385,9 @@ let Player = {
         }
     },
     endGameWin : function () {
-        alert("Winner, Winner, Chicken Dinner");
+        if (GameState.hasWinner) return;
         GameState.hasWinner = true;
+        alert("Winner, Winner, Chicken Dinner");
         Player.updateBalanceWin();
         Player.totalWins++;
         UI.displayOverallStatus();
@@ -397,8 +412,10 @@ let Player = {
         document.getElementById("dealerHit").style.display="block";
     },
     updateBalanceLoss : function() {
+        document.getElementById("outOfFunds").style.display="none";
         Player.balance -= Player.bet;
-        if (Player.balance === 0){
+        if (Player.balance <= 0){
+            Player.balance = 0;
             alert("Game Over, Insufficient Funds!");
             document.getElementById("overallStatusTitle").innerHTML = `Insufficient Funds, Click Restart for New Game`;
             document.getElementById("outOfFunds").style.display="block";
@@ -411,29 +428,6 @@ let Player = {
     updateBalanceWin : function() {
         this.balance += (this.bet * Blackjack.standardOrBlackjack().payout);
     },
-    handContainsAces : function() {
-        let hasAce = false;
-        for(let i=0; i<Player.hand.length; i++){
-            if(Player.hand[i].img.includes("A")){
-                hasAce = true;
-                Player.acesInHand++;
-            }
-        }
-        return hasAce;
-    },
-    specialAceRule : function() {
-        console.log("In specialAceRule");
-        console.log(`HandValueBefore: ${Player.totalHandValue}`);
-        if(Player.totalHandValue > 21 && Player.handContainsAces()){
-            Player.totalHandValue -= 10;
-            Player.usedSpecialAceRule = true;
-            console.log("In specialAceRule If");
-            console.log(`HandValueDuring: ${Player.totalHandValue}`);
-        }
-        document.getElementById("playerValue").innerHTML = Player.totalHandValue;
-        console.log("After specialAceRule If");
-        console.log(`HandValueAfter: ${Player.totalHandValue}`);
-    }
 };
 
 let Dealer = {
@@ -444,14 +438,14 @@ let Dealer = {
     dealInitialCards: function(){
         this.hand = [];
         for (let i = 0; i < Blackjack.startingCards; i++) {
-            this.hand.push(Deck.getCard(this.hand));
+            this.hand.push(Deck.getCard(Player.hand, this.hand));
         }
     },
     hit: function() {
-        let card = Deck.getCard(this.hand);
+        let card = Deck.getCard(Player.hand, this.hand);
 
         if (card === null) {
-            this.hand = Blackjack.setHand();
+            this.hand = Blackjack.setHand(Player.hand);
         } else {
             this.hand.push(card);
         }
@@ -459,32 +453,27 @@ let Dealer = {
         UI.displayTotalHand(Dealer.hand, "Dealer Cards")
         UI.displayCurrentStatus();
         document.getElementById("currentGameTitle").innerHTML = `Dealer Plays Showing ${this.getTotalValue()}`;
-        if (Dealer.totalHandValue > 16 && Dealer.totalHandValue > Player.totalHandValue && Dealer.totalHandValue < 22){
-            document.getElementById("currentGameTitle").innerHTML = `Dealer Wins by Points!`;
-            Player.endGameLoss();
-        }
-        if (Dealer.totalHandValue > 16 && Dealer.totalHandValue < Player.totalHandValue){
-            document.getElementById("currentGameTitle").innerHTML = `Player Wins by Points!`;
-            Player.endGameWin();
-        }
-        if (Dealer.totalHandValue === Player.totalHandValue){
-            document.getElementById("currentGameTitle").innerHTML = `The House Wins by Tie!`;
-            Player.endGameLoss();
-        }
-        if (this.isBusted()){
+        const dealerTotal = this.getTotalValue();
+        const playerTotal = Player.getTotalValue();
+        if (dealerTotal < 17) return;
+
+        if (GameState.hasWinner) return;
+        if (this.isBusted()) {
             document.getElementById("currentGameTitle").innerHTML = `Bet: ${Player.bet} Game Over Dealer Busts! Player Wins!`;
             Player.endGameWin();
             document.getElementById("dealerAnimation").innerHTML = "<img src='images/busted.png' alt='Dealer Busted' style='height: 100px;'/>";
             document.getElementById("overallStatusTitle").innerHTML ="Play Again!"
+        } else if (dealerTotal >= playerTotal) {
+            document.getElementById("currentGameTitle").innerHTML = dealerTotal === playerTotal ? `The House Wins by Tie!` : `Dealer Wins by Points!`;
+            Player.endGameLoss();
+        } else {
+            document.getElementById("currentGameTitle").innerHTML = `Player Wins by Points!`;
+            Player.endGameWin();
         }
     },
     getTotalValue : function(){
-        let tempHandValue = 0;
-        for (let i=0; i<this.hand.length; i++){
-            tempHandValue += this.hand[i].value;
-        }
-        this.totalHandValue = tempHandValue;
-        return tempHandValue;
+        this.totalHandValue = handValue(this.hand);
+        return this.totalHandValue;
     },
     getOneCardValue : function(){
         return this.hand[1].value;
@@ -510,12 +499,11 @@ let Blackjack = {
         ['blackjack', 2],
     ]),
     startingCards: 2,
-    setHand : function(){
+    setHand : function(...otherHands){
         let hand = [];
         for(let i=0; i<this.startingCards; i++){
-            hand.push(Deck.getCard(hand));
+            hand.push(Deck.getCard(hand, ...otherHands));
         }
-        console.log( "Hand->"); console.log( hand );
         return hand;
     },
     standardOrBlackjack : function(){
@@ -523,15 +511,12 @@ let Blackjack = {
             payout : this.payoutRates.get('standard'),
             winType : 'standard'
         }
-        if (this.gotBlackjack(Player.hand)){
+        if (hasBlackjack(Player.hand)){
             initialHandResults.payout = this.payoutRates.get('blackjack');
             initialHandResults.winType = 'blackjack';
         }
 
         return initialHandResults;
-    },
-    gotBlackjack : function(hand){
-        return (hand[0].img.includes("A") || hand[1].img.includes("A")) && (hand[0].img.includes("J") || hand[1].img.includes("J"));
     }
 };
 function hasBlackjack(hand) {
@@ -540,7 +525,6 @@ function hasBlackjack(hand) {
     return isAce && isTenOrFaceCard && hand.length === 2;
 }
 function startGame() {
-    console.log("New Game has started");
     Player.hand = [];
     Player.busted = false;
     Dealer.hand = [];
@@ -550,9 +534,7 @@ function startGame() {
     Blackjack.gameState = "Player";
     Player.totalHandValue = 0;
     Dealer.totalHandValue = 0;
-    Player.acesInHand = 0;
     Player.standing = false;
-    Player.usedSpecialAceRule = false;
     GameState.hasWinner = false;
     clearInterval(GameState.animationId);
     GameState.animationId = undefined;
@@ -572,7 +554,7 @@ function startGame() {
         Dealer.dealInitialCards();
         Player.getTotalValue();
 
-        if (Blackjack.gotBlackjack(Dealer.hand)){
+        if (hasBlackjack(Dealer.hand)){
             alert("Dealer Got BlackJack!");
             UI.displayTotalHand(Player.hand, "Player Cards");
             UI.displayTotalHand(Dealer.hand, "Dealer Cards");
@@ -581,7 +563,7 @@ function startGame() {
             document.getElementById("currentGameTitle").innerHTML = `BLACKJACK Dealer, You Lost!`;
             document.getElementById("overallStatusTitle").innerHTML = `Dealer BlackJack!! Current Status`;
             return;
-        } else if (Blackjack.gotBlackjack(Player.hand)){
+        } else if (hasBlackjack(Player.hand)){
             alert("User Got BlackJack!");
             UI.displayTotalHand(Player.hand, "Player Cards");
             UI.displayTotalHand(Dealer.hand, "Dealer Cards");
@@ -591,16 +573,9 @@ function startGame() {
             document.getElementById("overallStatusTitle").innerHTML = `BlackJack! Current Status`;
             return;
         } else if (Player.isBusted()){
-            if (Player.handContainsAces() && !Player.usedSpecialAceRule) {
-                UI.displayCurrentStatus();
-                for(let i=0; i<Player.acesInHand; i++){
-                    Player.specialAceRule()
-                }
-            } else {
-                Player.endGameLoss()
-                UI.displayCurrentStatus();
-                return;
-            }
+            Player.endGameLoss();
+            UI.displayCurrentStatus();
+            return;
         }
         document.getElementById("hitButton").style.display="";
         document.getElementById("standButton").style.display="";

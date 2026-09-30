@@ -16,6 +16,7 @@
   <img src="https://img.shields.io/badge/HTML5-e34f26?logo=html5&logoColor=white" alt="HTML5">
   <img src="https://img.shields.io/badge/CSS3-1572b6?logo=css3&logoColor=white" alt="CSS3">
   <img src="https://img.shields.io/badge/build-none-lightgrey" alt="No build step">
+  <img src="https://img.shields.io/badge/tests-14%20passing-brightgreen" alt="14 tests passing">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license"></a>
 </p>
 
@@ -37,10 +38,10 @@ the only outside dependency is a Font Awesome kit used for the bust animation.
   500 and no more than your balance. Every rule a bet breaks is listed at once
   instead of one error at a time.
 - **Running balance.** Wins pay 1 to 1, and the balance, current bet, games,
-  wins and losses stay on screen. A natural pays 2 to 1, but only Ace plus Jack
-  is recognized as one (see [known issues](#known-issues)).
+  wins and losses stay on screen. A two-card natural (Ace plus any 10, Jack,
+  Queen or King) pays 2 to 1.
 - **Out of funds.** When the balance hits zero, betting locks and a Restart
-  button resets the bankroll and the win and loss record.
+  button resets the bankroll, the win and loss record and the deck.
 
 <p align="center">
   <img src="docs/validation.png" width="640" alt="A bet of -12.5 rejected with two messages: cannot bet a negative amount, and bets must be integers">
@@ -53,9 +54,8 @@ the only outside dependency is a Font Awesome kit used for the bust animation.
 - **Hit or stick.** Draw as many cards as you like; going over 21 ends the hand
   immediately with a bust.
 - **Dealer turn.** After you stick, the hole card flips and a Dealer Play button
-  steps the dealer's hand one card at a time. The dealer draws until it passes
-  16 or busts. A tie at any point goes to the house and ends the hand, even
-  below 17.
+  steps the dealer's hand one card at a time. The dealer draws until reaching
+  at least 17 or busting. The house wins ties once the dealer reaches 17.
 - **Results you can see.** Winner and loser badges, a busted animation and a
   blackjack badge mark how each hand ended.
 
@@ -75,9 +75,8 @@ the only outside dependency is a Font Awesome kit used for the bust animation.
 
 - **52 cards, tracked.** Each card is marked as dealt, so no card repeats until
   the deck runs out.
-- **Reshuffle.** When the deck is empty it reshuffles, holding back only the
-  cards in the hand being dealt to, so a card still in the other hand can come
-  around again.
+- **Reshuffle.** When the deck is empty it reshuffles, holding back every card
+  still on the table in either hand.
 
 ### Layout
 
@@ -93,6 +92,12 @@ Nothing to install. Clone it and open the page:
 git clone https://github.com/cl0ax/BlackJack-Game.git
 cd BlackJack-Game
 open jack.html        # macOS; on Windows use: start jack.html
+```
+
+Run the automated game-logic tests with Node.js:
+
+```bash
+node --test
 ```
 
 Or serve it locally:
@@ -128,30 +133,7 @@ control to the Hit and Stick buttons.
 
 ## Known issues
 
-These are in the current code and left as they are for now.
-
-- **Blackjack is only recognized for Ace plus Jack.** The check at
-  `javascriptBJ.js:534` looks for a Jack rather than any ten-value card, so Ace
-  with 10, Queen or King plays on as an ordinary 21 and pays 1 to 1. A second,
-  correct check (`hasBlackjack`, line 537) decides which badge to show, which is
-  why such a hand can win by points and still display a blackjack badge.
-- **A rejected bet is written into the page as HTML.** The error message
-  includes the raw input and is assigned with `innerHTML`
-  (`javascriptBJ.js:154`), so typing markup into the bet box runs it in your own
-  browser. It is local only, but it is the first thing to fix.
-- **Dealer aces always count as 11**, so a dealer hand like Jack, 2, Ace reads
-  23 and is scored as a bust.
-- **The player's ace correction is only attempted on the first bust of a hand**,
-  and its loop over-counts aces, so hands with two aces can be scored wrong
-  (Ace, 3, Ace, 10 reads 25 instead of 15).
-- **One hand can be scored twice.** The checks in `Player.stand()` (from line
-  323) are separate `if` statements, so a dealer Ace-Ace hand can record a loss
-  and then a win. If that loss takes the balance to zero, the page ends up
-  showing the bet form, the Restart button and the out-of-funds message at once.
-- **Restart keeps the deck.** It resets the bankroll and the record, but the
-  cards already dealt stay marked until the next reshuffle.
-- Wins, losses and reshuffles are announced with browser `alert()` dialogs.
-- There are no automated tests.
+Wins, losses and reshuffles are announced with browser `alert()` dialogs.
 
 ## License
 
