@@ -1,57 +1,158 @@
-# BlackJack-Game
+<h1 align="center">BlackJack Plus</h1>
 
-This is a browser-based coursework project built with plain HTML, CSS, and JavaScript. It demonstrates DOM updates, form validation, object-based game state, random card selection, responsive styling, and a multi-step blackjack-like game loop.
+<p align="center">
+  A blackjack table in the browser, written in plain HTML, CSS and JavaScript.
+</p>
 
-It is a classroom exercise, not a production casino game or a complete implementation of standard blackjack rules.
+<p align="center">
+  <a href="#features">Features</a> ·
+  <a href="#quick-start">Quick start</a> ·
+  <a href="#how-it-works">How it works</a> ·
+  <a href="#known-issues">Known issues</a>
+</p>
 
-## What it does
+<p align="center">
+  <img src="https://img.shields.io/badge/JavaScript-f7df1e?logo=javascript&logoColor=black" alt="JavaScript">
+  <img src="https://img.shields.io/badge/HTML5-e34f26?logo=html5&logoColor=white" alt="HTML5">
+  <img src="https://img.shields.io/badge/CSS3-1572b6?logo=css3&logoColor=white" alt="CSS3">
+  <img src="https://img.shields.io/badge/build-none-lightgrey" alt="No build step">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license"></a>
+</p>
 
-- Starts the player with a balance of 1000.
-- Accepts positive integer bets up to 500 and no more than the current balance.
-- Deals two image-backed cards to the player and dealer.
-- Hides one dealer card during the player's turn.
-- Lets the player hit or stick.
-- Exposes a separate `Dealer Play` button for dealer hits after the player sticks.
-- Tracks displayed hand values, hit counts, games, wins, losses, bets, and balance.
-- Handles busts, ties, initial blackjack checks, and win or loss balance changes.
-- Provides responsive layouts for narrower screens.
+<p align="center">
+  <img src="docs/demo.gif" width="720" alt="A real session: two invalid bets rejected, a hand that busts, then two hands hit up to 21 and won">
+</p>
 
-## Technologies
+You start with 1,000 chips, bet up to 500 a hand, and play against a dealer
+whose first card stays face down until you stick. Every hand updates a running
+balance and a win and loss record. I wrote it in 2023 as a course assignment:
+the game logic is my own JavaScript with no framework and no build step, and
+the only outside dependency is a Font Awesome kit used for the bust animation.
 
-- HTML
-- CSS
-- JavaScript
-- Local PNG and JPEG assets
+## Features
 
-## Run locally
+### Betting
 
-No build step is required. Clone the repository and open `jack.html` in a browser:
+- **Bet validation.** A bet has to be a whole number, above zero, no more than
+  500 and no more than your balance. Every rule a bet breaks is listed at once
+  instead of one error at a time.
+- **Running balance.** Wins pay 1 to 1, and the balance, current bet, games,
+  wins and losses stay on screen. A natural pays 2 to 1, but only Ace plus Jack
+  is recognized as one (see [known issues](#known-issues)).
+- **Out of funds.** When the balance hits zero, betting locks and a Restart
+  button resets the bankroll and the win and loss record.
+
+<p align="center">
+  <img src="docs/validation.png" width="640" alt="A bet of -12.5 rejected with two messages: cannot bet a negative amount, and bets must be integers">
+</p>
+
+### Playing a hand
+
+- **Hidden hole card.** The dealer's first card is dealt face down, and the
+  dealer total only counts the card you can see.
+- **Hit or stick.** Draw as many cards as you like; going over 21 ends the hand
+  immediately with a bust.
+- **Dealer turn.** After you stick, the hole card flips and a Dealer Play button
+  steps the dealer's hand one card at a time. The dealer draws until it passes
+  16 or busts. A tie at any point goes to the house and ends the hand, even
+  below 17.
+- **Results you can see.** Winner and loser badges, a busted animation and a
+  blackjack badge mark how each hand ended.
+
+<p align="center">
+  <img src="docs/player-turn.png" width="640" alt="Player turn: a king and a queen for 20 against a face-down card and a six, with Hit and Stick buttons">
+</p>
+
+<p align="center">
+  <img src="docs/bust.png" width="640" alt="A hand of 4, jack and 9 busting at 23, with the busted animation and loser badge">
+</p>
+
+<p align="center">
+  <img src="docs/win.png" width="640" alt="A 20 beating the dealer's 18 with the winner badge and the balance up to 1,100">
+</p>
+
+### The deck
+
+- **52 cards, tracked.** Each card is marked as dealt, so no card repeats until
+  the deck runs out.
+- **Reshuffle.** When the deck is empty it reshuffles, holding back only the
+  cards in the hand being dealt to, so a card still in the other hand can come
+  around again.
+
+### Layout
+
+- Breakpoints at 750px and 450px shrink the table, text and cards for tablets
+  and phones. It stays two columns, so on a small phone the text gets very small
+  and a long hand can run into the footer.
+
+## Quick start
+
+Nothing to install. Clone it and open the page:
 
 ```bash
 git clone https://github.com/cl0ax/BlackJack-Game.git
 cd BlackJack-Game
-open jack.html
+open jack.html        # macOS; on Windows use: start jack.html
 ```
 
-You can also use a local static server:
+Or serve it locally:
 
 ```bash
 python3 -m http.server 8000
+# then visit http://localhost:8000/jack.html
 ```
 
-Then visit `http://localhost:8000/jack.html`.
+The Font Awesome kit loads from the web, so the bust animation needs a network
+connection; the game itself does not.
 
-## How to play
+## How it works
 
-1. Enter a bet and click `Place Bet`.
-2. Use `Hit` to draw another player card.
-3. Use `Stick` to end the player's turn.
-4. Use `Dealer Play` to advance the dealer's hand when that button appears.
-5. Place another bet after the hand is resolved, or use restart to reset the session.
+The source is three files, with the card and badge artwork in `images/`.
 
-## Known limitations
+| File | What it holds |
+| --- | --- |
+| `jack.html` | The table: bet form, status tables, card areas and buttons |
+| `javascriptBJ.js` | The game: a set of objects plus two top-level functions |
+| `style.css` | Table layout, colors and the two breakpoints |
 
-- The rule set is simplified and the dealer wins ties.
-- Dealer play requires button clicks instead of running automatically.
-- The source contains overlapping blackjack checks and the original project noted that blackjack can trigger unexpectedly.
+`javascriptBJ.js` is built around a few objects that call into each other:
+`Deck` deals random undealt cards, `Player` and `Dealer` hold a hand and the
+actions each side can take, `UI` validates bets and draws the hands and status
+tables, `Blackjack` holds the payout rates and the blackjack check, and
+`GameState` handles running out of funds. Responsibilities overlap: `Player`
+and `Dealer` also write result messages and badges to the page directly.
+
+A hand starts in `startGame()`, which validates the bet, resets both hands,
+deals two cards each and checks for an immediate blackjack before handing
+control to the Hit and Stick buttons.
+
+## Known issues
+
+These are in the current code and left as they are for now.
+
+- **Blackjack is only recognized for Ace plus Jack.** The check at
+  `javascriptBJ.js:534` looks for a Jack rather than any ten-value card, so Ace
+  with 10, Queen or King plays on as an ordinary 21 and pays 1 to 1. A second,
+  correct check (`hasBlackjack`, line 537) decides which badge to show, which is
+  why such a hand can win by points and still display a blackjack badge.
+- **A rejected bet is written into the page as HTML.** The error message
+  includes the raw input and is assigned with `innerHTML`
+  (`javascriptBJ.js:154`), so typing markup into the bet box runs it in your own
+  browser. It is local only, but it is the first thing to fix.
+- **Dealer aces always count as 11**, so a dealer hand like Jack, 2, Ace reads
+  23 and is scored as a bust.
+- **The player's ace correction is only attempted on the first bust of a hand**,
+  and its loop over-counts aces, so hands with two aces can be scored wrong
+  (Ace, 3, Ace, 10 reads 25 instead of 15).
+- **One hand can be scored twice.** The checks in `Player.stand()` (from line
+  323) are separate `if` statements, so a dealer Ace-Ace hand can record a loss
+  and then a win. If that loss takes the balance to zero, the page ends up
+  showing the bet form, the Restart button and the out-of-funds message at once.
+- **Restart keeps the deck.** It resets the bankroll and the record, but the
+  cards already dealt stay marked until the next reshuffle.
+- Wins, losses and reshuffles are announced with browser `alert()` dialogs.
 - There are no automated tests.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
