@@ -32,57 +32,62 @@ the only outside dependency is a Font Awesome kit used for the bust animation.
 
 ## Features
 
-### Betting
-
-- **Bet validation.** A bet has to be a whole number, above zero, no more than
-  500 and no more than your balance. Every rule a bet breaks is listed at once
-  instead of one error at a time.
-- **Running balance.** Wins pay 1 to 1, and the balance, current bet, games,
-  wins and losses stay on screen. A two-card natural (Ace plus any 10, Jack,
-  Queen or King) pays 2 to 1.
-- **Out of funds.** When the balance hits zero, betting locks and a Restart
-  button resets the bankroll, the win and loss record and the deck.
-
-<p align="center">
-  <img src="docs/validation.png" width="640" alt="A bet of -12.5 rejected with two messages: cannot bet a negative amount, and bets must be integers">
-</p>
-
-### Playing a hand
-
-- **Hidden hole card.** The dealer's first card is dealt face down, and the
-  dealer total only counts the card you can see.
-- **Hit or stick.** Draw as many cards as you like; going over 21 ends the hand
-  immediately with a bust.
-- **Dealer turn.** After you stick, the hole card flips and a Dealer Play button
-  steps the dealer's hand one card at a time. The dealer draws until reaching
-  at least 17 or busting. The house wins ties once the dealer reaches 17.
-- **Results you can see.** Winner and loser badges, a busted animation and a
-  blackjack badge mark how each hand ended.
-
-<p align="center">
-  <img src="docs/player-turn.png" width="640" alt="Player turn: a king and a queen for 20 against a face-down card and a six, with Hit and Stick buttons">
-</p>
-
-<p align="center">
-  <img src="docs/bust.png" width="640" alt="A hand of 4, jack and 9 busting at 23, with the busted animation and loser badge">
-</p>
-
-<p align="center">
-  <img src="docs/win.png" width="640" alt="A 20 beating the dealer's 18 with the winner badge and the balance up to 1,100">
-</p>
-
-### The deck
-
-- **52 cards, tracked.** Each card is marked as dealt, so no card repeats until
-  the deck runs out.
-- **Reshuffle.** When the deck is empty it reshuffles, holding back every card
-  still on the table in either hand.
-
-### Layout
-
-- Breakpoints at 750px and 450px shrink the table, text and cards for tablets
-  and phones. It stays two columns, so on a small phone the text gets very small
-  and a long hand can run into the footer.
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <b>Bet validation</b><br><br>
+      <img src="docs/validation.png" width="100%" alt="A bet of -12.5 rejected with two messages: cannot bet a negative amount, and bets must be integers"><br>
+      A bet has to be a whole number, above zero, no more than 500 and no more than your balance. Every rule a bet breaks is listed at once instead of one error at a time.
+    </td>
+    <td width="50%" valign="top">
+      <b>Hidden hole card</b><br><br>
+      <img src="docs/player-turn.png" width="100%" alt="Player turn: a king and a queen for 20 against a face-down card and a six, with Hit and Stick buttons"><br>
+      The dealer's first card is dealt face down, and the dealer total only counts the card you can see.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <b>Hit or stick</b><br><br>
+      <img src="docs/bust.png" width="100%" alt="A hand of 4, jack and 9 busting at 23, with the busted animation and loser badge"><br>
+      Draw as many cards as you like; going over 21 ends the hand immediately with a bust.
+    </td>
+    <td width="50%" valign="top">
+      <b>Results you can see</b><br><br>
+      <img src="docs/win.png" width="100%" alt="A 20 beating the dealer's 18 with the winner badge and the balance up to 1,100"><br>
+      Winner and loser badges, a busted animation and a blackjack badge mark how each hand ended.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <b>Running balance</b><br>
+      Wins pay 1 to 1, and the balance, current bet, games, wins and losses stay on screen. A two-card natural (Ace plus any 10, Jack, Queen or King) pays 2 to 1.
+    </td>
+    <td width="50%" valign="top">
+      <b>Out of funds</b><br>
+      When the balance hits zero, betting locks and a Restart button resets the bankroll, the win and loss record and the deck.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <b>Dealer turn</b><br>
+      After you stick, the hole card flips and a Dealer Play button steps the dealer's hand one card at a time. The dealer draws until reaching at least 17 or busting. The house wins ties once the dealer reaches 17.
+    </td>
+    <td width="50%" valign="top">
+      <b>52 cards, tracked</b><br>
+      Each card is marked as dealt, so no card repeats until the deck runs out.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <b>Reshuffle</b><br>
+      When the deck is empty it reshuffles, holding back every card still on the table in either hand.
+    </td>
+    <td width="50%" valign="top">
+      <b>Layout</b><br>
+      Breakpoints at 750px and 450px shrink the table, text and cards for tablets and phones. It stays two columns, so on a small phone the text gets very small and a long hand can run into the footer.
+    </td>
+  </tr>
+</table>
 
 ## Quick start
 
